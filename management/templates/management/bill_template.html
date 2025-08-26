@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sales Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            width: 8.5in; /* A4 width */
+            height: 5.5in; /* Half A4 height */
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .details div {
+            flex: 1;
+        }
+        .details p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+        .totals {
+            text-align: right;
+        }
+        .totals p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .print-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media print {
+            .print-button-container {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AEINDRI AGRO FOOD PRODUCT PVT. LTD.</h1>
+        <p>Apurba Nagar, P.O. – Ghogra, P.S. – Falakata, Dist – Alipurduar, Pin – 735211</p>
+        <p>Ph: 9733075841, 8617833078</p>
+        <h2>TAX INVOICE</h2>
+    </div>
+
+    <div class="details">
+        <div>
+            <p><strong>Invoice No:</strong> {{ bill.id }}</p>
+            <p><strong>Date:</strong> {{ bill.bill_date|date:"d-m-Y" }}</p>
+        </div>
+        <div>
+            <p><strong>Customer:</strong> {{ bill.customer.name }}</p>
+            <p><strong>Address:</strong> {{ bill.customer.address }}</p>
+            <p><strong>Phone:</strong> {{ bill.customer.phone_number }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity (Kg)</th>
+                <th>Price/Kg</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in bill_items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity_kg }}</td>
+                <td>{{ item.price_per_unit }}</td>
+                <td>{{ item.quantity_kg|mul:item.price_per_unit|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <p><strong>Subtotal:</strong> ₹ {{ subtotal|floatformat:2 }}</p>
+        <p><strong>GST:</strong> 
+            {% if bill.has_gst %}
+                ₹ {{ gst|floatformat:2 }}
+            {% else %}
+                Not Applicable
+            {% endif %}
+        </p>
+        {% if bill.other_expenses > 0 %}
+            <p><strong>Other Expenses:</strong> ₹ {{ bill.other_expenses|floatformat:2 }}</p>
+        {% endif %}
+        <p><strong>Grand Total:</strong> ₹ {{ grand_total|floatformat:2 }}</p>
+    </div>
+
+    <div class="print-button-container">
+        <button onclick="window.print()">Print Bill</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bill Print</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .bill-container {
+            max-width: 800px;
+            margin: auto;
+            border: 1px solid #ddd;
+            padding: 25px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #555;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #4CAF50;
+        }
+        .bill-info, .customer-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .customer-info p, .bill-info p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            text-align: right;
+        }
+        .total-box {
+            width: 50%;
+        }
+        .total-box p {
+            margin: 5px 0;
+        }
+        .grand-total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 15px;
+        }
+        @media print {
+            body {
+                padding: 0;
+            }
+            .bill-container {
+                box-shadow: none;
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bill-container">
+        <div class="header">
+            <h1>AEINDRI AGRO FOOD PRODUCT</h1>
+            <p>Bill of Sale</p>
+        </div>
+
+        <div class="bill-info">
+            <div>
+                <p><strong>Bill ID:</strong> #{{ bill.id }}</p>
+                <p><strong>Date:</strong> {{ bill.bill_date|date:"F j, Y" }}</p>
+            </div>
+            <div class="customer-info">
+                <p><strong>Customer:</strong> {{ bill.customer.name }}</p>
+                <p><strong>Phone:</strong> {{ bill.customer.phone_number }}</p>
+            </div>
+        </div>
+        
+        <h2>Items Sold</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity (kg)</th>
+                    <th>Price per Unit</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in bill.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity_kg }}</td>
+                    <td>₹{{ item.price_per_unit }}</td>
+                    <td>₹{{ item.total_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total-section">
+            <div class="total-box">
+                <p><strong>Subtotal:</strong> ₹{{ bill.get_subtotal }}</p>
+                {% if bill.has_gst %}
+                <p><strong>GST (18%):</strong> ₹{{ bill.get_gst_amount }}</p>
+                {% endif %}
+                <p><strong>Other Expenses:</strong> ₹{{ bill.other_expenses }}</p>
+                <div class="grand-total">
+                    <p>Grand Total: ₹{{ bill.get_grand_total }}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>

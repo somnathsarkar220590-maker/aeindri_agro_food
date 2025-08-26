@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Combined Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .report-summary {
+            margin-top: 30px;
+            border-top: 2px solid #555;
+            padding-top: 20px;
+        }
+        .report-summary p {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .profit {
+            color: green;
+        }
+        .loss {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Combined Business Report</h1>
+    </div>
+    <p>This report provides a summary of your total sales, expenses, and overall profit or loss.</p>
+
+    <div class="report-summary">
+        <p>Total Sales (incl. GST): ₹ {{ total_sales|floatformat:2 }}</p>
+        <p>Total Expenses: ₹ {{ total_expenses|floatformat:2 }}</p>
+        <hr>
+        <p>Profit/Loss: 
+            {% if profit_or_loss >= 0 %}
+                <span class="profit">₹ {{ profit_or_loss|floatformat:2 }} (Profit)</span>
+            {% else %}
+                <span class="loss">₹ {{ profit_or_loss|floatformat:2 }} (Loss)</span>
+            {% endif %}
+        </p>
+    </div>
+</body>
+</html>

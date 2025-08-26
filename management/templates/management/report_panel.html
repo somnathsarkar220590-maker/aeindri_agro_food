@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Business Reports</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; }
+        .report-form { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        .report-form label { font-weight: bold; margin-right: 10px; }
+        .report-form select, .report-form input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+        .report-form button { padding: 10px 15px; border: none; background-color: #007bff; color: white; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .report-title { margin-top: 40px; }
+        .summary-box { border: 1px solid #007bff; padding: 15px; border-radius: 8px; background-color: #e6f2ff; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Comprehensive Business Reports</h1>
+        <p>Select a report type and date range to view business data.</p>
+    </div>
+
+    <div class="report-form">
+        <form method="get" action="{% url 'report_panel' %}">
+            <label for="report_type">Report Type:</label>
+            <select name="report_type" id="report_type">
+                <option value="daily_sales" {% if report_type == 'daily_sales' %}selected{% endif %}>Daily Sales</option>
+                <option value="weekly_sales" {% if report_type == 'weekly_sales' %}selected{% endif %}>Weekly Sales</option>
+                <option value="monthly_sales" {% if report_type == 'monthly_sales' %}selected{% endif %}>Monthly Sales</option>
+                <option value="production" {% if report_type == 'production' %}selected{% endif %}>Production Report</option>
+                <option value="expenses" {% if report_type == 'expenses' %}selected{% endif %}>Detailed Expense Report</option>
+                <option value="payment" {% if report_type == 'payment' %}selected{% endif %}>Payment Report (Cash/Credit)</option>
+            </select>
+            <label for="start_date">Start Date:</label>
+            <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+            <label for="end_date">End Date:</label>
+            <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+            <button type="submit">Generate Report</button>
+        </form>
+    </div>
+
+    {% if report_type == 'daily_sales' or report_type == 'weekly_sales' or report_type == 'monthly_sales' %}
+        <h2 class="report-title">Sales Report</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Total Sales Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in report_data.sales %}
+                    <tr>
+                        <td>{{ item.date|date:"d M Y" }}</td>
+                        <td>₹ {{ item.total_sales|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if report_type == 'production' %}
+        <h2 class="report-title">Production Report</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Quantity (Kg)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in report_data.production %}
+                    <tr>
+                        <td>{{ item.date|date:"d M Y" }}</td>
+                        <td>{{ item.product__name }}</td>
+                        <td>{{ item.total_quantity|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if report_type == 'expenses' %}
+        <h2 class="report-title">Detailed Expense Report</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in report_data.expenses %}
+                    <tr>
+                        <td>{{ item.date|date:"d M Y" }}</td>
+                        <td>{{ item.description }}</td>
+                        <td>₹ {{ item.amount|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if report_type == 'payment' %}
+        <h2 class="report-title">Payment Report</h2>
+        <div class="summary-box">
+            <p><strong>Total Cash Paid:</strong> ₹ {{ report_data.payments.total_cash_paid|floatformat:2 }}</p>
+            <p><strong>Total Credit Due:</strong> ₹ {{ report_data.payments.total_credit_due|floatformat:2 }}</p>
+        </div>
+    {% endif %}
+
+</body>
+</html>
